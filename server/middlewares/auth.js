@@ -7,6 +7,8 @@ function authentication(req, res, next){
         const {access_token} = req.headers;
         const dataDecoded = verifyToken(access_token);
 
+        console.log(dataDecoded)
+
         user.findOne({
             where: {id: dataDecoded.id}
         })
@@ -18,9 +20,11 @@ function authentication(req, res, next){
                 }
             }
 
+            console.log(result)
             req.currentUser = {
-                id: result.id,
+                id: result.id
             }
+
             next();
         })
         .catch(err => {
@@ -41,10 +45,10 @@ const authorization = (req, res, next) => {
         if (!result){
             throw {
                 name: "AuthorizationError",
-                message: `Gallery List with id ${id} not found`
+                message: `Data List with id ${id} not found`
             }
         }
-        if (result.UserId == req.currentUser.id){
+        if (result.userid == req.currentUser.id){
             return next();
         } else {
             throw{
