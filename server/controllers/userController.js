@@ -2,6 +2,7 @@ const { comparePassword } = require('../helpers/bcrypt.js')
 const {user} = require('../models/index.js')
 const { generateToken } = require('../helpers/jwt.js')
 const {OAuth2Client} = require('google-auth-library')
+const axios = require('axios')
 
 class UserController{
     static register(req, res, next) {
@@ -107,6 +108,29 @@ class UserController{
             })
 
             res.status(201).json({access_token: token})
+        })
+    }
+
+    static loginCaptcha(req, res, next){
+        console.log(req.body)
+
+        let data = {
+            secret: process.env.SECRET_KEY_CAPTCHA,
+            response: req.body.response
+        }
+
+        console.log(data)
+
+        axios({
+            method: 'post',
+            url: `https://www.google.com/recaptcha/api/siteverify?secret=${data.secret}&response=${data.response}`
+        })
+        .then(result => {
+            console.log("HASIL CATPCHA", result.data)
+            res.status(201).json(result.data)
+        })          
+        .catch(err => {
+            next(err)
         })
     }
 }
