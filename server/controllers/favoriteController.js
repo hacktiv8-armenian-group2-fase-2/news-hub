@@ -4,6 +4,7 @@ const {favorite} = require('../models/index.js');
 
 class favoriteController{
     static toList(req, res, next){
+        console.log(req.currentUser)
         favorite.findAll({
             where: {userid: req.currentUser.id},
             order: ['id'],
@@ -17,8 +18,8 @@ class favoriteController{
     }
 
     static addData(req, res, next){
-        console.log("ADD")
-        req.body.UserId = req.currentUser.id
+        console.log(req.body)
+        req.body.userid = req.currentUser.id
         favorite.create(req.body)
         .then(result => {
             res.status(201).json(result)
