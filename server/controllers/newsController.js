@@ -20,7 +20,6 @@ class newsController{
                 )
             });
             
-            console.log("1---------", result.data)
             return axios.get('https://gnews.io/api/v4/top-headlines?token=' + process.env.GNEWS_API_TOKEN)
         })
         .then(result => {
