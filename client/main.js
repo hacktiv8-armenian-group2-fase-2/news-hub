@@ -3,16 +3,25 @@ const baseURL = 'http://localhost:3000';
 $(document).ready(function () {
   auth();
 
-  $('#register-btn').click(function (e) {
+  $('#home-logo').click(function (e) {
     e.preventDefault();
-    $('#register-container').show();
-    $('#login-container').hide();
+    auth();
   });
 
-  $('#register-cancel-btn').click(function (e) {
+  $('#main-btn-register, #navlink-register, #register-link').click(function (e) {
     e.preventDefault();
-    $('#register-container').hide();
-    $('#login-container').show();
+    $('#hero-page').hide();
+    $('#login-section').hide();
+    $('#register-section').show();
+    $('#register-form')[0].reset();
+  });
+
+  $('#main-btn-sign-in, #navlink-sign-in, #login-link').click(function (e) {
+    e.preventDefault();
+    $('#hero-page').hide();
+    $('#login-section').show();
+    $('#register-section').hide();
+    $('#login-form')[0].reset();
   });
 
   $('#register-form').submit(function (e) {
@@ -25,7 +34,12 @@ $(document).ready(function () {
     login();
   });
 
-  $('#logout-btn').click(function (e) {
+  $('#today')
+    .text
+    // todo: date format
+    ();
+
+  $('#sign-out').click(function (e) {
     e.preventDefault();
     localStorage.removeItem('access_token');
     signOut();
@@ -33,24 +47,23 @@ $(document).ready(function () {
     $('#login-form')[0].reset();
   });
 
-  // todo: mungkin butuh event binding
-  $('#fav-btn').click(function (e) {
+  $('#main-table-news').on('click', '#main-add-favorite', function (e) {
     e.preventDefault();
     const title = $('#title').text();
     const description = $('#description').text();
-    const url = $('#url').text();
-    const imageUrl = $('#imageUrl').text();
+    const url = $('#url').attr('href');
+    const imageUrl = $('#imageUrl').attr('src');
     const publishedAt = $('#publishedAt').text();
+    console.log(title, description, url, imageUrl, publishedAt);
     addFavorite(title, description, url, imageUrl, publishedAt);
   });
 
-  $('#show-fav-btn').click(function (e) {
+  $('#my-favorite').click(function (e) {
     e.preventDefault();
     showFavorites();
   });
 
-  // todo: mungkin butuh event binding
-  $('#delete-btn').click(function (e) {
+  $('#main-table-fav').on('click', '#main-remove-favorite', function (e) {
     e.preventDefault();
     const id = $(this).data().id;
     const title = $(this).data().title;
@@ -60,27 +73,31 @@ $(document).ready(function () {
 
 function auth() {
   if (localStorage.getItem('access_token')) {
-    $('#login-container').hide();
-    $('#register-container').hide();
-    $('#header').show();
-    $('#main-page').show();
+    $('#hero-page').hide();
+    $('#login-section').hide();
+    $('#register-section').hide();
+    $('#nav-signed-in').show();
+    $('#main-container').show();
+    $('#favorite-container').hide();
 
     getNews();
   } else {
-    $('#login-container').show();
-    $('#register-container').hide();
-    $('#header').hide();
-    $('#main-page').hide();
+    $('#hero-page').show();
+    $('#login-section').hide();
+    $('#register-section').hide();
+    $('#nav-signed-in').hide();
+    $('#main-container').hide();
+    $('#favorite-container').hide();
   }
 }
 
 function register() {
   $.ajax({
     type: 'POST',
-    url: baseURL + '/register',
+    url: baseURL + '/users/register',
     data: {
-      email: $('#new-email').val(),
-      password: $('#new-password').val(),
+      email: $('#register-email').val(),
+      password: $('#register-password').val(),
     },
   })
     .done((user) => {
@@ -97,10 +114,10 @@ function register() {
 function login() {
   $.ajax({
     type: 'POST',
-    url: baseURL + '/login',
+    url: baseURL + '/users/login',
     data: {
-      email: $('#new-email').val(),
-      password: $('#new-password').val(),
+      email: $('#login-email').val(),
+      password: $('#login-password').val(),
     },
   })
     .done((res) => {
@@ -145,10 +162,106 @@ function getNews() {
     },
   })
     .done((news) => {
+      $('#main-table-news').empty();
       news.forEach((el) => {
-        $('#card-news').append(
+        $('#main-table-news').append(
           `
-          // todo: add card-news element/content
+          <tbody id="main-table-news-body" class="bg-white divide-y divide-gray-300">
+            <tr id="main-card-news">
+              <td class="px-3 py-3 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="flex-auto h-30 w-30">
+                    <img id="imageUrl" data-imageUrl="${el.imageUrl}"
+                      class="h-30 w-30 rounded"
+                      src="${el.imageUrl}"
+                      alt=""
+                    />
+                  </div>
+                </div>
+              </td>
+
+              <td class="px-3 py-4">
+                <div class="text-lg font-bold leading-7 text-gray-900 sm:text-xl sm:truncate" id="title">${el.title}</div>
+                <div class="text-sm text-gray-500" id="description">
+                  ${el.description}
+                </div>
+              </td>
+
+              <td class="px-4 py-2 whitespace-nowrap text-xs text-gray-500">
+                <span class="px-4 py-2 inline-flex text-xs leading-5 font-medium rounded-full bg-gray-100 text-gray-800" id="publishedAt">
+                  ${el.publishedAt}
+                </span>
+              </td>
+
+              <td class="px-3 py-1 whitespace-nowrap text-right text-sm font-medium">
+                <span id="main-read-news" class="hidden sm:block ml-3">
+                  <a id="url" href="${el.url}" target="_blank"><button
+                    type="button"
+                    class="
+                      inline-flex
+                      items-center
+                      px-4
+                      py-2
+                      border border-gray-300
+                      rounded-md
+                      shadow-sm
+                      text-sm
+                      font-medium
+                      text-gray-700
+                      bg-white
+                      hover:bg-gray-50
+                      focus:outline-none
+                      focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400
+                    "
+                  >
+                    Read News
+                  </button></a>
+                </span>
+              </td>
+
+              <td class="px-3 py-1 whitespace-nowrap text-right text-sm font-medium">
+                <span class="sm:ml-3">
+                  <button
+                    id="main-add-favorite"
+                    type="button"
+                    class="
+                      inline-flex
+                      items-center
+                      px-4
+                      py-2
+                      border border-transparent
+                      rounded-md
+                      shadow-sm
+                      text-sm
+                      font-medium
+                      text-white
+                      bg-yellow-500
+                      hover:bg-yellow-400
+                      focus:outline-none
+                      focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500
+                    "
+                  >
+                    <!-- Heroicon name: solid/check -->
+
+                    <svg
+                      class="-ml-1 mr-2 h-5 w-5"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                    Add to Favorites
+                  </button>
+                </span>
+              </td>
+            </tr>
+          </tbody>
           `
         );
       });
@@ -167,7 +280,7 @@ function addFavorite(title, description, url, imageUrl, publishedAt) {
       description,
       url,
       imageUrl,
-      publishedAt,
+      publishedAt: new Date().toISOString().split('T')[0],
     },
     headers: {
       access_token: localStorage.getItem('access_token'),
@@ -193,18 +306,114 @@ function showFavorites() {
     },
   })
     .done((favs) => {
-      console.log(favs);
       if (favs.length == 0) {
-        $('#favorites-container').hide();
-        $('#main-page').hide();
-        $('no-favs').show();
+        $('#favorite-container').hide();
+        $('#main-container').hide();
+        // $('no-favs').show();
       } else {
-        $('#favorites-container').show();
-        $('#favs').empty();
+        $('#favorite-container').show();
+        $('#main-container').hide();
+        $('#main-table-fav').empty();
         favs.forEach((el) => {
-          $('#favs').append(
+          $('#main-table-fav').append(
             `
-            // todo: add favs div content
+            <tbody id="main-table-favorite-body" class="bg-white divide-y divide-gray-300">
+              <tr id="main-card-favorite" >
+                <td class="px-3 py-3 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="flex-auto h-30 w-30">
+                      <img
+                        class="h-30 w-30 rounded"
+                        src="${el.imageUrl}"
+                        alt=""
+                      />
+                    </div>
+                  </div>
+                </td>
+
+                <td class="px-3 py-4">
+                  <div class="text-lg font-bold leading-7 text-gray-900 sm:text-xl sm:truncate">${el.title}</div>
+                  <div class="text-sm text-gray-500">
+                    ${el.description}
+                  </div>
+                </td>
+
+                <td class="px-4 py-2 whitespace-nowrap text-xs text-gray-500">
+                  <span class="px-4 py-2 inline-flex text-xs leading-5 font-medium rounded-full bg-gray-100 text-gray-800">
+                  ${el.publishedAt}
+                  </span>
+                </td>
+
+                <td class="px-3 py-1 whitespace-nowrap text-right text-sm font-medium">
+                  <span id="main-read-favorite" class="hidden sm:block ml-3">
+                    <a href="${el.url}" target="_blank"><button
+                      type="button"
+                      class="
+                        inline-flex
+                        items-center
+                        px-4
+                        py-2
+                        border border-gray-300
+                        rounded-md
+                        shadow-sm
+                        text-sm
+                        font-medium
+                        text-gray-700
+                        bg-white
+                        hover:bg-gray-50
+                        focus:outline-none
+                        focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400
+                      "
+                    >
+                      Read News
+                    </button></a>
+                  </span>
+                </td>
+
+                <td class="px-3 py-1 whitespace-nowrap text-right text-sm font-medium">
+                  <span class="sm:ml-3">
+                    <button
+                      id="main-remove-favorite"
+                      data-id="${el.id}" data-title="${el.title}"
+                      type="button"
+                      class="
+                        inline-flex
+                        items-center
+                        px-4
+                        py-2
+                        border border-transparent
+                        rounded-md
+                        shadow-sm
+                        text-sm
+                        font-medium
+                        text-white
+                        bg-gray-800
+                        hover:text-yellow-400
+                        focus:outline-none
+                        focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500
+                      "
+                    >
+                      <!-- Heroicon name: solid/check -->
+
+                      <svg
+                        class="-ml-1 mr-2 h-5 w-5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path
+                          fill-rule="evenodd"
+                          d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                          clip-rule="evenodd"
+                        />
+                      </svg>
+                      Remove from list
+                    </button>
+                  </span>
+                </td>
+              </tr>
+            </tbody>
             `
           );
         });
