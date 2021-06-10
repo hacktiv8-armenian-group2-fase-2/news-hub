@@ -3,9 +3,10 @@
 ​
 List of available endpoints:
 ​
-- `POST /register`
-- `POST /login`
-- `POST /login-google`
+- `POST /users/register`
+- `POST /users/login`
+- `POST /users/login-google`
+- `POST /users/login-captcha`
 
 And routes below need authentication
 - `POST /favorites`
@@ -13,7 +14,7 @@ And routes below need authentication
 - `DELETE /favorites/:id`
 - `GET /news`
 
-### POST /register
+### POST /users/register
 
 Request:
 
@@ -39,7 +40,7 @@ Response:
 }
 ```
 
-### POST /login
+### POST /users/login
 
 Request:
 
@@ -64,7 +65,7 @@ Response:
 }
 ```
 
-### POST /login-google
+### POST /users/login-google
 
 Request:
 
@@ -85,6 +86,33 @@ Response:
 ```json
 {
   "access_token": "string"
+}
+```
+
+### POST /users/login-captcha
+
+Request:
+
+- data:
+
+```json
+{
+  "response": "string"
+}
+```
+
+Response:
+
+- status: 200
+- body:
+  ​
+
+```json
+{
+  "success": "true|false",
+  "challenge_ts": "timestamp",  // timestamp of the challenge load (ISO format yyyy-MM-dd'T'HH:mm:ssZZ)
+  "hostname": "string",         // the hostname of the site where the reCAPTCHA was solved
+  "error-codes": "[...]"        // optional
 }
 ```
 
