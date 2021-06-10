@@ -5,6 +5,7 @@ List of available endpoints:
 ​
 - `POST /register`
 - `POST /login`
+- `POST /login-google`
 
 And routes below need authentication
 - `POST /favorites`
@@ -48,6 +49,30 @@ Request:
 {
   "email": "string",
   "password": "string"
+}
+```
+
+Response:
+
+- status: 200
+- body:
+  ​
+
+```json
+{
+  "access_token": "string"
+}
+```
+
+### POST /login-google
+
+Request:
+
+- data:
+
+```json
+{
+  "id_token_google": "string"
 }
 ```
 
