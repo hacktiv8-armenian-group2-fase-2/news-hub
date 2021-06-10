@@ -11,6 +11,7 @@
 
     <link href="/tailwind.css" rel="stylesheet" />
     <link rel="shortcut icon" type="image/png" href="./assets/favicon-01.png" />
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <title>NewsHub</title>
   </head>
   <body>
@@ -301,6 +302,8 @@
             </div>
           </div>
 
+          <div class="g-recaptcha group flex justify-center" data-sitekey="6LfIPCUbAAAAAAGuG8Lb7lRqY9_BeXcYXQeEvyCU"></div>
+
           <div>
             <button
               type="submit"
@@ -348,7 +351,7 @@
           <p class="mt-2 text-center font-bold text-sm text-black">Or sign in with:</p>
         </div>
         <div class="flex items-center justify-center">
-          <div class="g-signin2" data-onsuccess="onSignIn"></div>
+          <div class="g-signin2" data-onsuccess="onSignIn" data-width="450"></div>
         </div>
         <!-- <a href="#" onclick="signOut();">Sign out</a> -->
       </div>
