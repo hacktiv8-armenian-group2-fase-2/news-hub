@@ -3,6 +3,8 @@ const baseURL = 'http://localhost:3000';
 $(document).ready(function () {
   auth();
 
+  $('#today').text(new Date())
+
   $('#home-logo').click(function (e) {
     e.preventDefault();
     auth();
@@ -113,37 +115,74 @@ function register() {
 
 function login() {
   $.ajax({
-    type: 'POST',
-    url: baseURL + '/users/login',
+    type: "POST",
+    url: baseURL + "/users/login-captcha",
     data: {
-      email: $('#login-email').val(),
-      password: $('#login-password').val(),
-    },
+      response: grecaptcha.getResponse()
+    }
   })
-    .done((res) => {
-      localStorage.setItem('access_token', res.access_token);
-      auth();
-    })
-    .fail((err) => {
-      console.log(err);
-      // todo: add login error alert
-    });
+  .done(result => {
+    grecaptcha.reset();
+
+    if (result.success == true) {
+      $.ajax({
+        type: 'POST',
+        url: baseURL + '/users/login',
+        data: {
+          email: $('#login-email').val(),
+          password: $('#login-password').val(),
+        },
+      })
+        .done((res) => {
+          localStorage.setItem('access_token', res.access_token);
+          auth();
+        })
+        .fail((err) => {
+          console.log(err);
+          swal(err.responseJSON.message, "", "warning")
+        });
+    } else {
+      swal("Please Check Catpcha", "", "warning")
+    }
+  })
+  .fail(err => {
+    swal(err.responseJSON.message, "", "warning")
+  })
 }
 
 function onSignIn(googleUser) {
-  const id_token = googleUser.getAuthResponse().id_token_google;
   $.ajax({
-    type: 'POST',
-    url: baseURL + '/users/login-google',
+    type: "POST",
+    url: baseURL + "/users/login-captcha",
     data: {
-      token: id_token,
-    },
+      response: grecaptcha.getResponse()
+    }
   })
-    .done((res) => {
-      localStorage.setItem('access_token', res.access_token);
-      auth();
+  .done(result => {
+    grecaptcha.reset();
+
+    if (result.success == true) {
+      const id_token = googleUser.getAuthResponse().id_token;
+      console.log("====>>", id_token)
+      $.ajax({
+        type: 'POST',
+        url: baseURL + '/users/login-google',
+        data: {
+          token: id_token,
+        },
+      })
+        .done((res) => {
+          localStorage.setItem('access_token', res.access_token);
+          auth();
+        })
+        .fail((err) => console.log(err));
+      } else {
+        swal("Please Check Catpcha", "", "warning")
+      }
     })
-    .fail((err) => console.log(err));
+    .fail(err => {
+      swal(err.responseJSON.message, "", "warning")
+    })
 }
 
 function signOut() {

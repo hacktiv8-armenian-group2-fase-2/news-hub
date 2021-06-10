@@ -69,12 +69,13 @@ class UserController{
     }
 
     static loginGoogle(req, res, next){
+        console.log("token ", req.body)
         const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-        const {id_token_google } =req.body;
+        const {token} = req.body;
         let emailUser = "";
 
         client.verifyIdToken({
-            idToken: id_token_google,
+            idToken: token,
             audience: process.env.GOOGLE_CLIENT_ID
         })
         .then(ticket => {
@@ -82,29 +83,31 @@ class UserController{
             const {email} = payload
             emailUser = email;
 
-            return users.findOne({
+            console.log("ticket", req.body)
+
+            return user.findOne({
                 where: {email: emailUser}
             })
-        }).then(user => {
-            if (!user) {
+        }).then(result => {
+            if (!result) {
                 console.log("create user")
-                return users.create({
+                return user.create({
                     email: emailUser,
                     password: String(Math.random()) + String(Math.random())
                 })
             } else {
                 console.log("DONE user")
                 return {
-                    id: user.id,
-                    email: user.email
+                    id: result.id,
+                    email: result.email
                 }
             }
         })
-        .then(user => {
-            console.log("user ==>", user)
+        .then(result => {
+            console.log("user ==>", result)
             const token = generateToken({
-                id: user.id,
-                email: user.email
+                id: result.id,
+                email: result.email
             })
 
             res.status(201).json({access_token: token})
