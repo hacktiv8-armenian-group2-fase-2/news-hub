@@ -106,7 +106,7 @@ function register() {
     })
     .fail((err) => {
       console.log(err);
-      // todo: add register error alert
+      swal(err.responseJSON.message, "", "warning")
     });
 }
 
