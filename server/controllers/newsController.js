@@ -56,7 +56,10 @@ class newsController{
             )
         })
         .catch(err => {
-            next(err)
+            // next(err)
+            res.status(200).json(
+                listBerita
+            )
         })
     }
 }
