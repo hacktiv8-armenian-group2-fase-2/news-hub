@@ -233,6 +233,7 @@ function getNews() {
                   <a id="url-${noUrut}" href="${el.url}" target="_blank"><button
                     type="button"
                     class="
+                      transition duration-200
                       inline-flex
                       items-center
                       px-4
@@ -261,6 +262,7 @@ function getNews() {
                     type="button"
                     data-id="${noUrut}"
                     class="
+                      transition duration-200
                       inline-flex
                       items-center
                       px-4
@@ -387,6 +389,7 @@ function showFavorites() {
                     <a href="${el.url}" target="_blank"><button
                       type="button"
                       class="
+                        transition duration-200
                         inline-flex
                         items-center
                         px-4
@@ -415,6 +418,7 @@ function showFavorites() {
                       data-id="${el.id}" data-title="${el.title}"
                       type="button"
                       class="
+                        transition duration-200
                         inline-flex
                         items-center
                         px-4
