@@ -46,11 +46,13 @@ $(document).ready(function () {
 
   $('#main-table-news').on('click', '#main-add-favorite', function (e) {
     e.preventDefault();
-    const title = $('#title').text().substring(0, 250);
-    const description = $('#description').text().substring(0, 250);
-    const url = $('#url').attr('href');
-    const imageUrl = $('#imageUrl').attr('src');
-    const publishedAt = $('#publishedAt').text();
+    let dataId = $(this).attr("data-id")
+
+    const title = $('#title-' + dataId).text().substring(0, 250);
+    const description = $('#description-' + dataId).text().substring(0, 250);
+    const url = $('#url-' + dataId).attr('href');
+    const imageUrl = $('#imageUrl-' + dataId).attr('src');
+    const publishedAt = $('#publishedAt-' + dataId).text();
     console.log(title, description, url, imageUrl, publishedAt);
     addFavorite(title, description, url, imageUrl, publishedAt);
   });
@@ -197,14 +199,14 @@ function getNews() {
   })
     .done((news) => {
       $('#main-table-news').empty();
-      news.forEach((el) => {
+      news.forEach((el, noUrut) => {
         $('#main-table-news').append(
           `<tbody id="main-table-news-body">
             <tr id="main-card-news">
               <td class="px-3 py-3 whitespace-nowrap">
                 <div class="flex items-center">
                   <div class="flex-auto h-30 w-30">
-                    <img id="imageUrl" data-imageUrl="${el.imageUrl}"
+                    <img id="imageUrl-${noUrut}" data-imageUrl="${el.imageUrl}"
                       class="h-30 w-30 rounded"
                       src="${el.imageUrl}"
                       alt=""
@@ -214,21 +216,21 @@ function getNews() {
               </td>
 
               <td class="px-3 py-4">
-                <div class="text-lg font-bold leading-7 text-gray-900 sm:text-xl " id="title">${el.title}</div>
-                <div class="text-sm text-gray-500" id="description">
+                <div class="text-lg font-bold leading-7 text-gray-900 sm:text-xl " id="title-${noUrut}">${el.title}"</div>
+                <div class="text-sm text-gray-500" id="description-${noUrut}">
                   ${el.description}
                 </div>
               </td>
 
               <td class="px-4 py-2 whitespace-nowrap text-xs text-gray-500">
-                <span class="px-4 py-2 inline-flex text-xs leading-5 font-medium rounded-full bg-gray-100 text-gray-800" id="publishedAt">
+                <span class="px-4 py-2 inline-flex text-xs leading-5 font-medium rounded-full bg-gray-100 text-gray-800" id="publishedAt-${noUrut}">
                   ${new Date(el.publishedAt).toISOString().slice(0, 10)}
                 </span>
               </td>
 
               <td class="px-3 py-1 whitespace-nowrap text-right text-sm font-medium">
                 <span id="main-read-news" class="hidden sm:block ml-3">
-                  <a id="url" href="${el.url}" target="_blank"><button
+                  <a id="url-${noUrut}" href="${el.url}" target="_blank"><button
                     type="button"
                     class="
                       inline-flex
@@ -257,6 +259,7 @@ function getNews() {
                   <button
                     id="main-add-favorite"
                     type="button"
+                    data-id="${noUrut}"
                     class="
                       inline-flex
                       items-center
@@ -320,13 +323,15 @@ function addFavorite(title, description, url, imageUrl, publishedAt) {
     },
   })
     .done((res) => {
+      swal("News Add to Favorites Successfully", "", "warning")
       console.log(res);
       getNews();
+      
       // todo: alert success add news to fav
     })
     .fail((err) => {
       // todo: alert fail add news to fav
-      console.log(err);
+      swal(err.responseJSON.message, "", "warning")
     });
 }
 
