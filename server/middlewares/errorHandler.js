@@ -1,0 +1,22 @@
+function errorHandler(err, req, res, next){
+    if (typeof (err) === 'string') {
+        return res.status(400).json({message: err})
+    }
+
+    console.log(err)
+    if (err.name == 'UnauthorizedError'){
+        return res.status(401).json({message: 'Invalid Token'})
+    }
+
+    if (err.name == 'LoginError'){
+        return res.status(401).json({message: err.message})
+    }
+
+    if (err.name == 'NotFound'){
+        return res.status(401).json({message: err.message})
+    }
+
+    return res.status(500).json({message: err.message})
+}
+
+module.exports = errorHandler;
