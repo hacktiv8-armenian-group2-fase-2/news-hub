@@ -51,12 +51,11 @@ $(document).ready(function () {
 
   $('#main-table-news').on('click', '#main-add-favorite', function (e) {
     e.preventDefault();
-    const title = $('#title').text();
-    const description = $('#description').text();
-    const url = $('#url').attr('href');
-    const imageUrl = $('#imageUrl').attr('src');
-    const publishedAt = $('#publishedAt').text();
-    console.log(title, description, url, imageUrl, publishedAt);
+    const title = $(this).data().title;
+    const description = $(this).data().description;
+    const url = $(this).data().url;
+    const imageUrl = $(this).data().imageurl;
+    const publishedAt = $(this).data().publishedat;
     addFavorite(title, description, url, imageUrl, publishedAt);
   });
 
@@ -201,6 +200,7 @@ function getNews() {
     },
   })
     .done((news) => {
+      console.log(news);
       $('#main-table-news').empty();
       news.forEach((el) => {
         $('#main-table-news').append(
@@ -228,7 +228,7 @@ function getNews() {
 
               <td class="px-4 py-2 whitespace-nowrap text-xs text-gray-500">
                 <span class="px-4 py-2 inline-flex text-xs leading-5 font-medium rounded-full bg-gray-100 text-gray-800" id="publishedAt">
-                  ${el.publishedAt}
+                  ${new Date(el.publishedAt).toISOString().split('T')[0]}
                 </span>
               </td>
 
@@ -262,6 +262,11 @@ function getNews() {
                 <span class="sm:ml-3">
                   <button
                     id="main-add-favorite"
+                    data-title="${el.title}"
+                    data-description="${el.description}"
+                    data-imageurl="${el.imageUrl}"
+                    data-url="${el.url}"
+                    data-publishedat="${el.publishedAt}"
                     type="button"
                     class="
                       inline-flex
@@ -326,7 +331,7 @@ function addFavorite(title, description, url, imageUrl, publishedAt) {
     },
   })
     .done((res) => {
-      console.log(res);
+      // console.log(res);
       getNews();
       // todo: alert success add news to fav
     })
@@ -379,7 +384,7 @@ function showFavorites() {
 
                 <td class="px-4 py-2 whitespace-nowrap text-xs text-gray-500">
                   <span class="px-4 py-2 inline-flex text-xs leading-5 font-medium rounded-full bg-gray-100 text-gray-800">
-                  ${el.publishedAt}
+                  ${new Date(el.publishedAt).toISOString().split('T')[0]}
                   </span>
                 </td>
 
